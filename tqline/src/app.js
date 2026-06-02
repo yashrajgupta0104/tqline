@@ -677,8 +677,8 @@ const renderAppShell = (state) => {
         <header class="page-header">
           <div class="page-title-group">
             ${currentView === 'home' ? `
-              <h1>Welcome back, Yashraj</h1>
-              <p>Explore your dissertation community ecosystem.</p>
+              <h1>T&QLine</h1>
+              <p>Thoughts that move you forward. Questions that unlock answers.</p>
             ` : ''}
             ${currentView === 'dashboard' ? `
               <h1>Lancs Discussion Hub</h1>

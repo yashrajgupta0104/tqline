@@ -157,7 +157,7 @@ export default {
                 <i data-lucide="shield" style="color: var(--primary-red); width: 22px; height: 22px;"></i> About T&QLine
               </h3>
               <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
-                T&QLine was founded by <strong>Yashraj Gupta</strong> alongside Lancaster postgraduate peers to bridge the isolation gap in independent dissertation research. Our mission is to facilitate peer feedback, methodology coordination, and community support.
+                T&QLine was founded solely by <strong>Yashraj Gupta</strong> to bridge the isolation gap in independent dissertation research. The mission is to facilitate peer feedback, methodology coordination, and community support.
               </p>
               <div style="background: rgba(181, 18, 27, 0.05); border-left: 3px solid var(--primary-red); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
                 <strong>Notice of Non-Affiliation:</strong> T&QLine is an independent, student-led resource. We are <strong>not officially affiliated with, endorsed by, or representing Lancaster University</strong> or its academic departments. All guides, templates, and advisories are compiled for peer support and general reference only.
