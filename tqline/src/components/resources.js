@@ -1,9 +1,53 @@
-/* Resources component - downloads, library links, and APA citation generator */
+/* Resources component - downloads, library links, APA citation generator, and Lancs Video Vault */
+
+const videos = [
+  {
+    id: 'lums-roadmap',
+    title: 'LUMS Dissertation Roadmap: Proposal to Distinction',
+    desc: 'A comprehensive guide to structuring a LUMS dissertation, writing literature reviews, and avoiding structural pitfalls.',
+    duration: '18:42',
+    faculty: 'LUMS',
+    speaker: 'Dr. Rebecca Hall',
+    role: 'PhD Research Advisor',
+    initials: 'RH',
+    youtubeId: 'K-G_71-l_kQ', // Swappable unlisted YouTube video ID
+    badgeClass: 'badge-lums',
+    avatarGradient: 'linear-gradient(135deg, var(--accent-orange), var(--primary-red))'
+  },
+  {
+    id: 'ethics-review',
+    title: 'Lancaster Ethics Review: High-Risk Sample Approval Guide',
+    desc: 'Critical pitfalls that lead to delayed ethics reviews in FASS and LUMS. Learn how to draft participant consent forms.',
+    duration: '14:15',
+    faculty: 'FASS / LUMS',
+    speaker: 'Michael Chang',
+    role: 'PhD Candidate & Tutor',
+    initials: 'MC',
+    youtubeId: '5e971L05Wjg', // Swappable unlisted YouTube video ID
+    badgeClass: 'badge-fass',
+    avatarGradient: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))'
+  },
+  {
+    id: 'methodology-coding',
+    title: 'Mastering NVivo Thematic Coding & SPSS Statistics',
+    desc: 'Practical walkthrough on importing semi-structured interviews into NVivo, parent theme coding, and SPSS regression analysis.',
+    duration: '22:30',
+    faculty: 'FST / LUMS',
+    speaker: 'David Vance',
+    role: 'Postgraduate Peer Mentor',
+    initials: 'DV',
+    youtubeId: 'c52wV53ZtT4', // Swappable unlisted YouTube video ID
+    badgeClass: 'badge-fst',
+    avatarGradient: 'linear-gradient(135deg, var(--accent-blue), var(--primary-red))'
+  }
+];
 
 export default {
   render(state) {
     const generatedCitation = state.generatedCitation || '';
     const citType = state.citationType || 'book'; // 'book', 'journal', 'web'
+    const watchingVideoId = state.watchingVideoId || null;
+    const watchingVideo = videos.find(v => v.id === watchingVideoId);
 
     return `
       <div class="mentors-layout">
@@ -143,6 +187,10 @@ export default {
                     <input type="text" class="form-input" id="cit-pages" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="45-56" required>
                   </div>
                 </div>
+                <div class="form-group" style="margin-bottom: 0; margin-top: 0.5rem;">
+                  <label class="form-label" style="font-size: 0.75rem;">DOI or URL (Optional)</label>
+                  <input type="text" class="form-input" id="cit-doi" style="padding: 0.5rem 0.75rem; font-size: 0.85rem;" placeholder="https://doi.org/10.1016/...">
+                </div>
               ` : ''}
 
               ${citType === 'web' ? `
@@ -165,8 +213,10 @@ export default {
             ${generatedCitation ? `
               <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--dark-border); border-radius: 10px; padding: 1rem; position: relative;">
                 <h4 style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Formatted Citation:</h4>
-                <div style="font-family: var(--font-serif); font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; padding-right: 2rem;" id="citation-result-text">
-                  ${generatedCitation}
+                <div style="font-family: var(--font-serif); font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; padding-right: 2rem;" id="citation-result-text">${generatedCitation}</div>
+                <div style="margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.25rem;">
+                  <i data-lucide="info" style="width: 12px; height: 12px; flex-shrink: 0; color: var(--accent-orange);"></i>
+                  <span>Draft only - always verify against official Lancaster guidelines.</span>
                 </div>
                 <button class="btn btn-secondary" id="btn-copy-citation" style="position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.25rem; border-radius: 6px;" title="Copy to Clipboard">
                   <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
@@ -175,6 +225,142 @@ export default {
             ` : ''}
           </div>
         </div>
+
+        <!-- Divider -->
+        <div style="margin: 2.5rem 0; border-top: 1px solid var(--dark-border);"></div>
+
+        <!-- Premium Video Vault Section -->
+        <div>
+          <div style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; background: linear-gradient(to right, #ffffff, var(--accent-grey)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="video" style="color: var(--primary-red); width: 22px; height: 22px;"></i> Lancs Dissertation Masterclasses
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+              Exclusive, bite-sized unlisted guide videos covering dissertation methodology, academic styling, and ethics approvals.
+            </p>
+          </div>
+
+          <div class="grid-3" style="margin-top: 1.5rem;">
+            ${videos.map(video => `
+              <div class="glass-card resource-card video-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 100%;">
+                <!-- Thumbnail Container -->
+                <div class="video-thumbnail-container" style="position: relative; width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid var(--dark-border); cursor: pointer;" data-video-id="${video.id}">
+                  <!-- Play button overlay -->
+                  <div class="video-play-btn" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary-red); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 0 20px var(--primary-red-glow); position: relative; z-index: 5;">
+                    <i data-lucide="play" style="width: 20px; height: 20px; fill: white; margin-left: 2px;"></i>
+                  </div>
+                  <!-- Duration Badge -->
+                  <div style="position: absolute; bottom: 0.75rem; right: 0.75rem; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 0.25rem; z-index: 5;">
+                    <i data-lucide="clock" style="width: 10px; height: 10px;"></i> ${video.duration}
+                  </div>
+                  <!-- Faculty Badge -->
+                  <div style="position: absolute; top: 0.75rem; left: 0.75rem; z-index: 5;">
+                    <span class="badge ${video.badgeClass}">${video.faculty}</span>
+                  </div>
+                </div>
+                
+                <!-- Info Container -->
+                <div style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 1rem;">
+                  <div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4; color: var(--text-primary);" class="video-title-hover" data-video-id="${video.id}">
+                      ${video.title}
+                    </h4>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin-bottom: 0;">
+                      ${video.desc}
+                    </p>
+                  </div>
+                  
+                  <!-- Speaker & Action -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--dark-border); padding-top: 0.75rem; margin-top: auto;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <div style="width: 28px; height: 28px; border-radius: 50%; background: ${video.avatarGradient}; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: white;">
+                        ${video.initials}
+                      </div>
+                      <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-primary);">${video.speaker}</span>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);">${video.role}</span>
+                      </div>
+                    </div>
+                    <button class="btn btn-secondary watch-video-btn" data-video-id="${video.id}" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                      <i data-lucide="eye" style="width: 12px; height: 12px;"></i> Watch
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Video Player Modal Overlay -->
+        ${watchingVideo ? `
+          <div class="modal-overlay" id="video-player-modal" style="z-index: 2000;">
+            <div class="modal-content" style="max-width: 800px; padding: 1.5rem;">
+              <button class="modal-close" id="close-video-btn" style="top: 1.5rem; right: 1.5rem; z-index: 10;">
+                <i data-lucide="x"></i>
+              </button>
+              
+              <!-- Video Title -->
+              <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; padding-right: 2.5rem; color: var(--text-primary); line-height: 1.4;">
+                ${watchingVideo.title}
+              </h3>
+              
+              <!-- Responsive Video Container -->
+              <div style="position: relative; width: 100%; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--dark-border);">
+                <iframe 
+                  src="https://www.youtube.com/embed/${watchingVideo.youtubeId}?autoplay=1&rel=0" 
+                  frameborder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowfullscreen 
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+                </iframe>
+              </div>
+              
+              <!-- Video Details & Associated Resources -->
+              <div style="margin-top: 1.25rem; display: flex; gap: 1.5rem; align-items: flex-start; justify-content: space-between; border-top: 1px solid var(--dark-border); padding-top: 1rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: ${watchingVideo.avatarGradient}; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: white;">
+                      ${watchingVideo.initials}
+                    </div>
+                    <div>
+                      <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary); display: block;">${watchingVideo.speaker}</span>
+                      <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">${watchingVideo.role}</span>
+                    </div>
+                  </div>
+                  <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                    ${watchingVideo.desc}
+                  </p>
+                </div>
+                
+                <div style="width: 250px; background: rgba(0,0,0,0.2); border: 1px solid var(--dark-border); border-radius: 10px; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.5px; display: block;">
+                    Associated Blueprints
+                  </span>
+                  <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    ${watchingVideo.id === 'lums-roadmap' ? `
+                      <button class="btn btn-secondary btn-download-mock" data-file="Lancs_Ethics_Review_Blueprint.pdf" style="padding: 0.35rem 0.5rem; font-size: 0.7rem; width: 100%; justify-content: flex-start;">
+                        <i data-lucide="file-text" style="width: 12px; height: 12px; color: var(--primary-red);"></i> Ethics Blueprint PDF
+                      </button>
+                      <button class="btn btn-secondary btn-download-mock" data-file="Lancs_Dissertation_Skeleton.docx" style="padding: 0.35rem 0.5rem; font-size: 0.7rem; width: 100%; justify-content: flex-start;">
+                        <i data-lucide="file-text" style="width: 12px; height: 12px; color: var(--accent-orange);"></i> Structural Skeleton Word
+                      </button>
+                    ` : ''}
+                    ${watchingVideo.id === 'ethics-review' ? `
+                      <button class="btn btn-secondary btn-download-mock" data-file="Lancs_Ethics_Review_Blueprint.pdf" style="padding: 0.35rem 0.5rem; font-size: 0.7rem; width: 100%; justify-content: flex-start;">
+                        <i data-lucide="file-text" style="width: 12px; height: 12px; color: var(--primary-red);"></i> Ethics Review PDF
+                      </button>
+                    ` : ''}
+                    ${watchingVideo.id === 'methodology-coding' ? `
+                      <button class="btn btn-secondary btn-download-mock" data-file="Lancs_SPSS_NVivo_Blueprint.pdf" style="padding: 0.35rem 0.5rem; font-size: 0.7rem; width: 100%; justify-content: flex-start;">
+                        <i data-lucide="file-text" style="width: 12px; height: 12px; color: var(--accent-blue);"></i> SPSS/NVivo Checklist PDF
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ` : ''}
       </div>
     `;
   },
@@ -187,7 +373,7 @@ export default {
     downloadBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const file = btn.getAttribute('data-file');
-        alert(`Downloading ${file}...\nMock document exported successfully under Lancaster University branding.`);
+        window.showToast(`Downloading ${file}... Reference blueprint guide downloaded successfully.`, 'success');
       });
     });
 
@@ -220,7 +406,19 @@ export default {
           const journal = document.getElementById('cit-journal').value.trim();
           const volume = document.getElementById('cit-volume').value.trim();
           const pages = document.getElementById('cit-pages').value.trim();
-          citation = `${author} (${year}). ${title}. <em>${journal}</em>, <em>${volume}</em>, ${pages}.`;
+          const doi = document.getElementById('cit-doi').value.trim();
+          
+          const volMatch = volume.match(/^([^(]+)(?:\(([^)]+)\))?$/);
+          let formattedVol = '';
+          if (volMatch) {
+            const volNum = volMatch[1].trim();
+            const issueNum = volMatch[2] ? volMatch[2].trim() : '';
+            formattedVol = `<em>${volNum}</em>` + (issueNum ? `(${issueNum})` : '');
+          } else {
+            formattedVol = `<em>${volume}</em>`;
+          }
+          
+          citation = `${author} (${year}). ${title}. <em>${journal}</em>, ${formattedVol}, ${pages}.` + (doi ? ` ${doi}` : '');
         } else if (citType === 'web') {
           const webname = document.getElementById('cit-webname').value.trim();
           const url = document.getElementById('cit-extra').value.trim();
@@ -236,14 +434,44 @@ export default {
     if (copyBtn) {
       copyBtn.addEventListener('click', () => {
         const textElement = document.getElementById('citation-result-text');
-        // Simple mock copy alert as fallback/real clipboard
         if (textElement) {
           const cleanText = textElement.textContent.replace(/\s+/g, ' ').trim();
           navigator.clipboard.writeText(cleanText).then(() => {
-            alert('Reference copied to clipboard!');
+            window.showToast('Reference copied to clipboard!', 'success');
           }).catch(() => {
-            alert(`Reference: \n${cleanText}`);
+            window.showToast(`Reference compiled: ${cleanText}`, 'success');
           });
+        }
+      });
+    }
+
+    // Bind Watch Video button events (both thumbnails & titles & watch CTA buttons)
+    const watchBtns = document.querySelectorAll('.watch-video-btn, .video-thumbnail-container, .video-title-hover');
+    watchBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Prevent click events from triggering twice if children elements are clicked
+        e.stopPropagation();
+        const videoId = btn.getAttribute('data-video-id');
+        if (videoId) {
+          actions.watchVideo(videoId);
+        }
+      });
+    });
+
+    // Bind Close Video button events
+    const closeVideoBtn = document.getElementById('close-video-btn');
+    if (closeVideoBtn) {
+      closeVideoBtn.addEventListener('click', () => {
+        actions.closeVideo();
+      });
+    }
+
+    // Close video modal on overlay click
+    const videoModal = document.getElementById('video-player-modal');
+    if (videoModal) {
+      videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+          actions.closeVideo();
         }
       });
     }

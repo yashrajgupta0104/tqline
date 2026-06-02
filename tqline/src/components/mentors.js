@@ -27,7 +27,7 @@ export default {
             Lancs Peer Advisors & Tutors
           </h2>
           <p style="color: var(--text-secondary); font-size: 0.95rem;">
-            Struggling with a thesis roadblock? Book a direct virtual peer review session with Lancaster PhD and senior postgraduate researchers who specialize in your academic methodology.
+            Struggling with a thesis roadblock? Book a direct virtual peer review session with Lancaster PhD and senior postgraduate researchers who specialise in your academic methodology.
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export default {
                     <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
                       <div style="display: flex; align-items: center; gap: 0.4rem;">
                         <i data-lucide="clock" style="width: 12px; height: 12px; color: var(--accent-blue);"></i>
-                        <span>Thursday, May ${session.day} at ${session.time}</span>
+                        <span>${session.day} at ${session.time}</span>
                       </div>
                     </div>
                     
@@ -64,6 +64,9 @@ export default {
                     ` : ''}
                   </div>
                   
+                  <button class="btn btn-secondary btn-export-calendar" data-index="${index}" style="width: 100%; justify-content: center; padding: 0.4rem; font-size: 0.75rem; border-color: rgba(59, 130, 246, 0.3); color: var(--accent-blue); margin-bottom: 0.5rem;">
+                    <i data-lucide="calendar-plus" style="width: 12px; height: 12px;"></i> Add to Calendar (.ics)
+                  </button>
                   <button class="btn btn-secondary btn-cancel-booking" data-index="${index}" style="width: 100%; justify-content: center; padding: 0.4rem; font-size: 0.75rem; border-color: rgba(181, 18, 27, 0.2); color: var(--text-secondary); transition: all 0.2s;">
                     <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i> Cancel Consultation
                   </button>
@@ -156,19 +159,36 @@ export default {
     const mentor = state.mentors.find(m => m.id === state.bookingMentorId);
     if (!mentor) return '';
 
-    const selectedDay = state.bookingSelectedDay || 28; // default to 28th
     const selectedSlot = state.bookingSelectedSlot || '';
 
-    // Mock calendar dates
-    const days = [
-      { num: 25, label: 'Mon', disabled: true },
-      { num: 26, label: 'Tue', disabled: true },
-      { num: 27, label: 'Wed', disabled: false },
-      { num: 28, label: 'Thu', disabled: false },
-      { num: 29, label: 'Fri', disabled: false },
-      { num: 30, label: 'Sat', disabled: true },
-      { num: 31, label: 'Sun', disabled: true }
-    ];
+    // Generate upcoming 7 rolling weekdays
+    const today = new Date();
+    const days = [];
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    for (let i = 1; i <= 7; i++) {
+      const nextDate = new Date();
+      nextDate.setDate(today.getDate() + i); // Start from tomorrow
+      
+      const dayOfWeek = daysOfWeek[nextDate.getDay()];
+      const isWeekend = nextDate.getDay() === 0 || nextDate.getDay() === 6;
+      
+      days.push({
+        num: nextDate.getDate(),
+        monthNum: nextDate.getMonth(),
+        year: nextDate.getFullYear(),
+        monthName: months[nextDate.getMonth()],
+        label: dayOfWeek,
+        disabled: isWeekend,
+        dateString: `${dayOfWeek}, ${months[nextDate.getMonth()]} ${nextDate.getDate()}`
+      });
+    }
+
+    const firstActiveDay = days.find(d => !d.disabled);
+    const selectedDay = state.bookingSelectedDay && typeof state.bookingSelectedDay === 'string'
+      ? state.bookingSelectedDay 
+      : (firstActiveDay ? firstActiveDay.dateString : 'Thu, May 28');
 
     const timeSlots = ['10:00 AM', '11:30 AM', '2:00 PM', '4:30 PM'];
 
@@ -187,13 +207,14 @@ export default {
           </p>
 
           <div class="calendar-widget">
-            <div class="calendar-header">May 2026</div>
+            <div class="calendar-header">Select Date (Upcoming Weekdays)</div>
             <div class="calendar-grid">
               ${days.map(d => `<div class="calendar-day-label">${d.label}</div>`).join('')}
               ${days.map(d => `
-                <button class="calendar-cell ${d.disabled ? 'disabled' : ''} ${d.num === selectedDay ? 'selected' : ''}" 
-                        data-day="${d.num}" ${d.disabled ? 'disabled' : ''}>
+                <button class="calendar-cell ${d.disabled ? 'disabled' : ''} ${d.dateString === selectedDay ? 'selected' : ''}" 
+                        data-day="${d.dateString}" ${d.disabled ? 'disabled' : ''}>
                   ${d.num}
+                  <span style="font-size: 0.5rem; display: block; font-weight: 500; opacity: 0.6; text-transform: uppercase;">${d.monthName}</span>
                 </button>
               `).join('')}
             </div>
@@ -271,6 +292,16 @@ export default {
       });
     });
 
+    // Bind iCalendar exports
+    const exportBtns = document.querySelectorAll('.btn-export-calendar');
+    exportBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = parseInt(btn.getAttribute('data-index'));
+        const session = state.bookedSessions[index];
+        window.exportToICS(session);
+      });
+    });
+
     // Bind reset filters button
     const resetFiltersBtn = document.getElementById('btn-reset-mentor-filters');
     if (resetFiltersBtn) {
@@ -310,7 +341,7 @@ export default {
       const dayCells = document.querySelectorAll('.calendar-cell:not(.disabled)');
       dayCells.forEach(cell => {
         cell.addEventListener('click', () => {
-          const day = parseInt(cell.getAttribute('data-day'));
+          const day = cell.getAttribute('data-day');
           actions.setBookingDay(day);
         });
       });

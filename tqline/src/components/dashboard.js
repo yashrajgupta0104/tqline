@@ -194,7 +194,7 @@ export default {
       const isCommentsOpen = state.openComments === idea.id;
 
       return `
-        <div class="glass-card idea-card" id="idea-card-${idea.id}">
+        <div class="glass-card idea-card ${idea.id === state.newlyCreatedPostId ? 'new-post-glow' : ''}" id="idea-card-${idea.id}">
           <div class="idea-card-header">
             <div class="idea-meta">
               <span class="badge ${facultyBadgeClass}">${idea.faculty.toUpperCase()}</span>
@@ -264,7 +264,7 @@ export default {
       const isCommentsOpen = state.openComments === q.id;
 
       return `
-        <div class="glass-card idea-card" id="question-card-${q.id}">
+        <div class="glass-card idea-card ${q.id === state.newlyCreatedPostId ? 'new-post-glow' : ''}" id="question-card-${q.id}">
           <div class="idea-card-header">
             <div class="idea-meta">
               <span class="badge ${facultyBadgeClass}">${q.faculty.toUpperCase()}</span>

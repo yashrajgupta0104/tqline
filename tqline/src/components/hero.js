@@ -2,8 +2,32 @@
 
 export default {
   render(state) {
+    const hotTopics = [
+      "Ethics committee reviews in the Lancaster University Management School (LUMS). Check the resources hub for the latest templates.",
+      "SPSS regression data cleaning for postgraduate researchers. Peer mentors are available in the matches grid.",
+      "Structuring a high-scoring Literature Review in FASS. Consult our updated dissertation skeleton.",
+      "Managing OneDrive backup syncs for long qualitative interview transcripts. See Michael Chang's CSS guides.",
+      "Navigating ethics reviews for online interview studies in FHM. Grab the student ethics checklist.",
+      "Structuring tables and graphs in LUMS quantitative research reports. APA citation guides are in the vault."
+    ];
+    const currentDay = new Date().getDay();
+    const activeHotTopic = hotTopics[currentDay % hotTopics.length];
+
     return `
       <div class="hero-wrapper">
+        <!-- Prototype mode banner -->
+        <div style="background: rgba(253, 144, 41, 0.08); border: 1px solid rgba(253, 144, 41, 0.2); border-radius: 12px; padding: 1rem 1.25rem; display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 2rem;">
+          <i data-lucide="info" style="color: var(--accent-orange); flex-shrink: 0; width: 20px; height: 20px; margin-top: 0.1rem;"></i>
+          <div>
+            <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">
+              T&QLine Early Beta Prototype
+            </h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+              Welcome to our early interactive design concept! Posts, upvotes, and bookings in this version are saved in your local browser sandbox. A persistent cloud database and official Lancaster student login verification are actively in planning. Feel free to explore and test the interface workflow!
+            </p>
+          </div>
+        </div>
+
         <!-- Hero Header section -->
         <div class="hero-main">
           <div class="hero-left">
@@ -11,7 +35,7 @@ export default {
               Let's talk about your <span>dissertation ideas.</span>
             </h1>
             <p class="hero-tagline">
-              T&QLine (Thoughts & Questions Line) is a premium community designed exclusively for <strong>Lancaster University students</strong>. Whether you are brainstorming, drafting a proposal, struggling with methodology, or navigating ethics reviews, we connect you with peers who understand.
+              T&QLine (Thoughts & Questions Line) is a collaborative community designed for <strong>Lancaster University students</strong>. Whether you are brainstorming, drafting a proposal, struggling with methodology, or navigating ethics reviews, we connect you with peers who understand.
             </p>
             
             <div class="hero-ctas">
@@ -43,12 +67,12 @@ export default {
                 </div>
                 <div class="stat-card">
                   <div class="stat-number" style="color: var(--accent-orange);">${state.mentors ? state.mentors.length : 6}</div>
-                  <div class="stat-label">Advisors</div>
+                  <div class="stat-label">Advisers</div>
                 </div>
               </div>
               
               <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--dark-border); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-                <p><strong>Hot Topic this week:</strong> Ethics committee reviews in the Lancaster University Management School (LUMS). Check the resources hub for the latest templates.</p>
+                <p><strong>Hot Topic this week:</strong> ${activeHotTopic}</p>
               </div>
             </div>
             
@@ -71,7 +95,7 @@ export default {
                       </div>
                       <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
                         <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
-                        <span>Thursday, May ${session.day} at ${session.time}</span>
+                        <span>${session.day} at ${session.time}</span>
                       </div>
                       ${session.notes ? `<p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem; border-left: 2px solid rgba(59, 130, 246, 0.3); padding-left: 0.5rem; line-height: 1.3;">${session.notes}</p>` : ''}
                     </div>
@@ -82,7 +106,7 @@ export default {
           </div>
         </div>
         
-        <!-- Premium Core Features Section -->
+        <!-- Features Section -->
         <div class="hero-features-section">
           <div style="text-align: center; margin-bottom: 3rem;">
             <p class="section-subtitle">How it works</p>
@@ -111,7 +135,7 @@ export default {
                 <i data-lucide="users" style="width: 22px; height: 22px;"></i>
               </div>
               <h3>3. Match Mentors</h3>
-              <p>Connect with high-achieving Lancaster postgraduates and PhD mentors who specialize in your academic domain.</p>
+              <p>Connect with high-achieving Lancaster postgraduates and PhD mentors who specialise in your academic domain.</p>
             </div>
             
             <div class="glass-card feature-card">
@@ -120,6 +144,33 @@ export default {
               </div>
               <h3>4. Academic Vault</h3>
               <p>Access school-specific template cards, referencing blueprints, and writing checklists calibrated for Lancaster criteria.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- About Initiative & Non-affiliation Section -->
+        <div class="glass-card" style="margin-top: 4rem; padding: 2.5rem; position: relative; overflow: hidden; background: linear-gradient(135deg, rgba(20, 20, 23, 0.95), rgba(181, 18, 27, 0.03)); border-color: var(--dark-border);">
+          <div style="position: absolute; top: -50px; left: -50px; width: 180px; height: 180px; background: rgba(181, 18, 27, 0.05); border-radius: 50%; filter: blur(50px);"></div>
+          <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 300px;">
+              <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="shield" style="color: var(--primary-red); width: 22px; height: 22px;"></i> About T&QLine
+              </h3>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem;">
+                T&QLine was founded by <strong>Yashraj Gupta</strong> alongside Lancaster postgraduate peers to bridge the isolation gap in independent dissertation research. Our mission is to facilitate peer feedback, methodology coordination, and community support.
+              </p>
+              <div style="background: rgba(181, 18, 27, 0.05); border-left: 3px solid var(--primary-red); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+                <strong>Notice of Non-Affiliation:</strong> T&QLine is an independent, student-led resource. We are <strong>not officially affiliated with, endorsed by, or representing Lancaster University</strong> or its academic departments. All guides, templates, and advisories are compiled for peer support and general reference only.
+              </div>
+            </div>
+            <div style="flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 1rem; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--dark-border); border-radius: 12px; padding: 1.25rem;">
+              <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Contact Support</h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                Have questions, suggestions, or want to join as a peer advisor? Drop us a line!
+              </p>
+              <a href="mailto:support@tqline.com" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.5rem; justify-content: center; width: 100%; text-decoration: none;">
+                <i data-lucide="mail" style="width: 14px; height: 14px;"></i> Email Support
+              </a>
             </div>
           </div>
         </div>

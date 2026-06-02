@@ -19,7 +19,23 @@
 </head>
 <body>
   <!-- Main application shell -->
-  <div id="app"></div>
+  <div id="app">
+    <!-- Initial Loading State -->
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #0c0c0e; color: #ffffff; font-family: 'Outfit', sans-serif; gap: 1.5rem;">
+      <div style="position: relative; width: 60px; height: 60px; border: 3px solid rgba(224, 30, 38, 0.1); border-top-color: #E01E26; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <div style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(to right, #ffffff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; align-items: center; gap: 0.25rem;">
+        T&Q<span style="color: #E01E26;">Line</span>
+      </div>
+      <div style="font-size: 0.85rem; color: #71717a; text-transform: uppercase; letter-spacing: 1.5px;">Loading Student Sandbox...</div>
+      
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
+  </div>
 
   <!-- Application Entry script -->
   <script type="module" src="src/app.js"></script>

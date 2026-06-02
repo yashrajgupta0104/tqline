@@ -157,7 +157,8 @@ const defaultState = {
   bookedSessions: [],
 
   citationType: 'book',
-  generatedCitation: ''
+  generatedCitation: '',
+  watchingVideoId: null
 };
 
 // Initialize State from Local Storage or defaults
@@ -189,14 +190,43 @@ const actions = {
   updateSearch(query) {
     state.searchQuery = query;
     syncStorage();
-    // Re-render only feed to keep input focus, or standard render
-    render();
-    // Keep focus at the end of the search input
-    const searchInput = document.getElementById('dashboard-search');
-    if (searchInput) {
-      searchInput.focus();
-      searchInput.setSelectionRange(query.length, query.length);
+    
+    if (state.view === 'dashboard') {
+      const feedList = document.querySelector('.feed-list');
+      if (feedList) {
+        const currentTab = state.dashboardTab || 'ideas';
+        const searchQuery = query.toLowerCase();
+        const activeFaculty = state.activeFaculty || 'all';
+        const activeStage = state.activeStage || 'all';
+        
+        const matchesFilters = (item) => {
+          const matchesSearch = item.title.toLowerCase().includes(searchQuery) || 
+                                item.content.toLowerCase().includes(searchQuery) ||
+                                (item.thesis && item.thesis.toLowerCase().includes(searchQuery));
+          const matchesFaculty = activeFaculty === 'all' || item.faculty.toLowerCase() === activeFaculty;
+          const matchesStage = activeStage === 'all' || item.stage.toLowerCase() === activeStage;
+          return matchesSearch && matchesFaculty && matchesStage;
+        };
+
+        if (currentTab === 'ideas') {
+          const filteredIdeas = state.ideas.filter(item => matchesFilters(item));
+          feedList.innerHTML = dashboard.renderIdeas(filteredIdeas, state);
+        } else {
+          const filteredQuestions = state.questions.filter(item => matchesFilters(item));
+          feedList.innerHTML = dashboard.renderQuestions(filteredQuestions, state);
+        }
+        
+        const clearBtn = document.getElementById('btn-clear-dashboard-search');
+        if (clearBtn) {
+          clearBtn.style.display = query ? 'flex' : 'none';
+        }
+        
+        dashboard.init(state, actions);
+        return;
+      }
     }
+    
+    render();
   },
 
   setFacultyFilter(faculty) {
@@ -282,10 +312,19 @@ const actions = {
       };
       state.questions.unshift(newQuestion);
       state.dashboardTab = 'questions';
+      state.newlyCreatedPostId = newQuestion.id;
     }
 
     state.isPitcherOpen = false;
     state.view = 'dashboard';
+    
+    const typeLabel = pitch.type === 'idea' ? 'Research proposal' : 'Academic question';
+    window.showToast(`${typeLabel} published successfully!`, 'success');
+    
+    setTimeout(() => {
+      state.newlyCreatedPostId = null;
+    }, 3000);
+
     syncStorage();
     render();
   },
@@ -357,14 +396,82 @@ const actions = {
   updateMentorSearch(query) {
     state.mentorSearchQuery = query;
     syncStorage();
-    render();
     
-    // Keep focus
-    const mentorSearch = document.getElementById('mentor-search');
-    if (mentorSearch) {
-      mentorSearch.focus();
-      mentorSearch.setSelectionRange(query.length, query.length);
+    if (state.view === 'mentors') {
+      const grid = document.querySelector('.mentors-layout .grid-3');
+      if (grid) {
+        const selectedSkill = state.selectedSkillFilter || 'all';
+        const searchQuery = query.toLowerCase();
+        
+        const filteredMentors = state.mentors.filter(mentor => {
+          const matchesSearch = mentor.name.toLowerCase().includes(searchQuery) ||
+                                mentor.bio.toLowerCase().includes(searchQuery) ||
+                                mentor.department.toLowerCase().includes(searchQuery);
+          const matchesSkill = selectedSkill === 'all' || mentor.skills.includes(selectedSkill);
+          return matchesSearch && matchesSkill;
+        });
+        
+        let gridHtml = '';
+        if (filteredMentors.length === 0) {
+          gridHtml = `
+            <div class="glass-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: var(--text-secondary);">
+              <i data-lucide="users" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1rem; margin-left: auto; margin-right: auto;"></i>
+              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">No Peer Tutors Found</h3>
+              <p style="margin-bottom: 1.5rem;">Try resetting filters or adjusting search terms.</p>
+              <button class="btn btn-primary" id="btn-reset-mentor-filters" style="margin: 0 auto; justify-content: center;">
+                <i data-lucide="rotate-ccw"></i> Reset Filters & Search
+              </button>
+            </div>
+          `;
+        } else {
+          gridHtml = filteredMentors.map(m => {
+            let avatarGrad = 'linear-gradient(135deg, var(--primary-red), #F87171)';
+            if (m.department === 'LUMS') avatarGrad = 'linear-gradient(135deg, var(--accent-orange), #fcd34d)';
+            if (m.department === 'FST') avatarGrad = 'linear-gradient(135deg, var(--accent-blue), #60a5fa)';
+            if (m.department === 'FASS') avatarGrad = 'linear-gradient(135deg, var(--accent-green), #34d399)';
+
+            return `
+              <div class="glass-card mentor-card">
+                <div>
+                  <div class="mentor-profile-header">
+                    <div class="mentor-avatar" style="background: ${avatarGrad};">
+                      ${m.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div class="mentor-meta-info">
+                      <h3 class="mentor-name">${m.name}</h3>
+                      <span class="mentor-role">${m.role}</span>
+                      <span class="mentor-dept">${m.department} faculty specialising</span>
+                    </div>
+                  </div>
+                  
+                  <p class="mentor-bio">${m.bio}</p>
+                  
+                  <div class="mentor-skills">
+                    ${m.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-book-session" data-id="${m.id}" style="width: 100%; justify-content: center;">
+                  <i data-lucide="calendar"></i> Book Free Consultation
+                </button>
+              </div>
+            `;
+          }).join('');
+        }
+        
+        grid.innerHTML = gridHtml;
+        
+        const clearBtn = document.getElementById('btn-clear-mentor-search');
+        if (clearBtn) {
+          clearBtn.style.display = query ? 'flex' : 'none';
+        }
+        
+        mentors.init(state, actions);
+        return;
+      }
     }
+    
+    render();
   },
 
   setSkillFilter(skill) {
@@ -397,7 +504,7 @@ const actions = {
 
   confirmBooking(notes) {
     if (!state.bookingSelectedSlot) {
-      alert('Please select a time slot to confirm your booking.');
+      window.showToast('Please select a time slot to confirm your booking.', 'error');
       return;
     }
     
@@ -408,21 +515,33 @@ const actions = {
       s => s.mentorName === mentor.name && s.day === state.bookingSelectedDay && s.time === state.bookingSelectedSlot
     );
     if (isClashing) {
-      alert(`Clash Detected!\nYou already have a booked peer session with ${mentor.name} on Thursday, May ${state.bookingSelectedDay} at ${state.bookingSelectedSlot}.\nPlease choose a different day or time slot.`);
+      window.showToast(`Clash Detected! You already have a booked session with ${mentor.name} on ${state.bookingSelectedDay} at ${state.bookingSelectedSlot}.`, 'error');
       return;
+    }
+
+    // Capture dynamic date timestamp
+    const dateMatch = state.bookingSelectedDay.match(/(\w+),\s+(\w+)\s+(\d+)/);
+    let timestamp = Date.now() + 24 * 60 * 60 * 1000; // default tomorrow
+    if (dateMatch) {
+      const monthsMap = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+      const parsedDate = new Date();
+      parsedDate.setMonth(monthsMap[dateMatch[2]]);
+      parsedDate.setDate(parseInt(dateMatch[3]));
+      timestamp = parsedDate.getTime();
     }
 
     const session = {
       mentorName: mentor.name,
       day: state.bookingSelectedDay,
       time: state.bookingSelectedSlot,
+      timestamp: timestamp,
       notes: notes
     };
     
     state.bookedSessions.push(session);
     state.bookingMentorId = null;
     
-    alert(`Success!\nYour peer review session with ${mentor.name} is confirmed for Thursday, May ${session.day} at ${session.time}.\nAn email invite with Teams meeting link has been sent to your Lancaster University address.`);
+    window.showToast(`Success! Peer session with ${mentor.name} scheduled for ${session.day} at ${session.time}.`, 'success');
     
     syncStorage();
     render();
@@ -433,6 +552,7 @@ const actions = {
       state.bookedSessions.splice(index, 1);
       syncStorage();
       render();
+      window.showToast("Consultation session cancelled successfully.", "success");
     }
   },
 
@@ -451,6 +571,16 @@ const actions = {
 
   setGeneratedCitation(cit) {
     state.generatedCitation = cit;
+    render();
+  },
+
+  watchVideo(videoId) {
+    state.watchingVideoId = videoId;
+    render();
+  },
+
+  closeVideo() {
+    state.watchingVideoId = null;
     render();
   },
 
@@ -628,3 +758,103 @@ const initEvents = () => {
 document.addEventListener('DOMContentLoaded', () => {
   render();
 });
+
+// Expose the dynamic, highly aesthetic HSL toast system to window
+window.showToast = (message, type = 'success') => {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type === 'error' ? 'toast-error' : ''}`;
+  
+  const icon = type === 'error' ? 'alert-circle' : 'check-circle';
+  toast.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <i data-lucide="${icon}" style="color: ${type === 'error' ? '#ef4444' : 'var(--primary-red)'}; width: 18px; height: 18px; flex-shrink: 0;"></i>
+      <span>${message}</span>
+    </div>
+    <button style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem; border-radius: 50%; hover: { color: var(--text-primary); }" onclick="this.parentElement.remove()">
+      <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+    </button>
+  `;
+
+  container.appendChild(toast);
+  lucide.createIcons({
+    attrs: { class: 'lucide' },
+    nameAttr: 'data-lucide'
+  });
+
+  // Animate in
+  setTimeout(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0) scale(1)';
+  }, 10);
+
+  // Auto-dismiss after 4 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px) scale(0.95)';
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 4000);
+};
+
+// Global escape key modal close handler
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.isPitcherOpen) actions.closePitcher();
+    if (state.bookingMentorId) actions.closeBookingModal();
+    if (state.watchingVideoId) actions.closeVideo();
+  }
+});
+
+// Dynamic iCalendar (.ics) exporter for peer consultations
+window.exportToICS = (session) => {
+  const today = new Date();
+  const sessionDate = new Date(session.timestamp || today.getTime());
+  
+  const [timeStr, ampm] = session.time.split(' ');
+  let [hours, minutes] = timeStr.split(':').map(Number);
+  if (ampm === 'PM' && hours < 12) hours += 12;
+  if (ampm === 'AM' && hours === 12) hours = 0;
+  
+  sessionDate.setHours(hours, minutes, 0, 0);
+  
+  const startDate = sessionDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  const endDateObj = new Date(sessionDate.getTime() + 60 * 60 * 1000);
+  const endDate = endDateObj.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  
+  const icsContent = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//TQLine//Peer Consultation//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `DTSTART:${startDate}`,
+    `DTEND:${endDate}`,
+    `SUMMARY:TQLine Peer Consultation with ${session.mentorName}`,
+    `DESCRIPTION:Your dilemma notes: ${session.notes || 'None'}\\n\\nVirtual Microsoft Teams meeting link will be sent to your Lancaster student address.`,
+    'LOCATION:Microsoft Teams (Student Portal)',
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `TQLine_Consultation_${session.mentorName.replace(/\s+/g, '_')}.ics`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  window.showToast('Calendar invite (.ics) downloaded!', 'success');
+};

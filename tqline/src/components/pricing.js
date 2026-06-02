@@ -32,7 +32,7 @@ export default {
               <span class="tier-name">Lancs Basic</span>
               <div class="tier-price">£0<span>/ month</span></div>
               <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-                Fully featured community access for all verified Lancaster University students and researchers.
+                Fully featured community access designed for Lancaster University students and researchers.
               </p>
               
               <ul class="tier-features">
@@ -57,14 +57,14 @@ export default {
                 £14.99<span>/ month</span>
               </div>
               <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
-                Phase 2 professional support tier. Connects you to commercial thesis advisors, proofreaders, and builders.
+                Phase 2 guidance tier. Connects you to advanced academic peer-coaches and doctoral feedback advisors, in strict compliance with university academic integrity rules.
               </p>
               
               <ul class="tier-features">
                 <li><i data-lucide="check-circle" class="check"></i> All basic student hub features</li>
-                <li><i data-lucide="lock" class="lock"></i> Verified academic proofreading checks</li>
+                <li><i data-lucide="lock" class="lock"></i> Academic coaching & feedback reviews</li>
                 <li><i data-lucide="lock" class="lock"></i> Priority advisor Q&A answering (under 4 hours)</li>
-                <li><i data-lucide="lock" class="lock"></i> LUMS-compliant LaTeX styling compilers</li>
+                <li><i data-lucide="lock" class="lock"></i> LUMS-compliant LaTeX styling guides</li>
                 <li><i data-lucide="lock" class="lock"></i> Dedicated PhD one-on-one reviews (2 hours/mo)</li>
               </ul>
             </div>
@@ -85,7 +85,7 @@ export default {
     const claimBtn = document.getElementById('btn-claim-free');
     if (claimBtn) {
       claimBtn.addEventListener('click', () => {
-        alert('Welcome! Your Free Beta Membership is fully activated.\nEnjoy full access to T&QLine Lancaster community features.');
+        window.showToast('Welcome! Your Free Beta Membership is fully activated.');
         actions.changeView('dashboard');
       });
     }

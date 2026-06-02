@@ -1,4 +1,4 @@
-/* Pitcher component - immersive wizard modal to post dissertation ideas */
+/* Pitcher component - interactive wizard modal to post dissertation ideas */
 
 export default {
   render(state) {
@@ -31,7 +31,7 @@ export default {
               <div class="form-group">
                 <label class="form-label">What are you sharing? *</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.25rem;">
-                  <label class="glass-card" style="padding: 1.25rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.5rem; border-color: ${state.tempPitch.type === 'idea' ? 'var(--primary-red)' : 'var(--dark-border)'};" id="type-option-idea">
+                  <label class="glass-card keyboard-focusable-card" tabindex="0" style="padding: 1.25rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.5rem; border-color: ${state.tempPitch.type === 'idea' ? 'var(--primary-red)' : 'var(--dark-border)'};" id="type-option-idea" aria-label="Select proposal type: Idea">
                     <input type="radio" name="pitch-type" value="idea" ${state.tempPitch.type === 'idea' ? 'checked' : ''} style="display:none;">
                     <span style="font-weight: 700; font-size: 0.95rem; color: ${state.tempPitch.type === 'idea' ? 'var(--primary-red)' : 'var(--text-primary)'}; display:flex; align-items:center; gap:0.5rem;">
                       <i data-lucide="lightbulb" style="width:16px; height:16px;"></i> Proposal Idea
@@ -39,7 +39,7 @@ export default {
                     <span style="font-size: 0.8rem; color: var(--text-secondary);">Pitch an abstract, research topic, or structural skeleton.</span>
                   </label>
                   
-                  <label class="glass-card" style="padding: 1.25rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.5rem; border-color: ${state.tempPitch.type === 'question' ? 'var(--primary-red)' : 'var(--dark-border)'};" id="type-option-question">
+                  <label class="glass-card keyboard-focusable-card" tabindex="0" style="padding: 1.25rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.5rem; border-color: ${state.tempPitch.type === 'question' ? 'var(--primary-red)' : 'var(--dark-border)'};" id="type-option-question" aria-label="Select proposal type: Thought or Question">
                     <input type="radio" name="pitch-type" value="question" ${state.tempPitch.type === 'question' ? 'checked' : ''} style="display:none;">
                     <span style="font-weight: 700; font-size: 0.95rem; color: ${state.tempPitch.type === 'question' ? 'var(--primary-red)' : 'var(--text-primary)'}; display:flex; align-items:center; gap:0.5rem;">
                       <i data-lucide="help-circle" style="width:16px; height:16px;"></i> Thought / Question
@@ -122,7 +122,7 @@ export default {
               <div style="background: rgba(181, 18, 27, 0.05); border: 1px solid rgba(181, 18, 27, 0.15); border-radius: 12px; padding: 1rem; margin-top: 1rem; display: flex; gap: 0.75rem; align-items: flex-start;">
                 <i data-lucide="shield-check" style="color: var(--primary-red); flex-shrink: 0; width: 18px; height: 18px; margin-top: 0.1rem;"></i>
                 <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
-                  <strong>Honor Code:</strong> By sharing your concepts on T&QLine, you maintain ultimate ownership. T&QLine is a discussion hub, designed for peer coordination and styling advice. Plagiarism is strictly prohibited.
+                  <strong>Honour Code:</strong> By sharing your concepts on T&QLine, you maintain ultimate ownership. T&QLine is a discussion hub, designed for peer coordination and styling advice. Plagiarism is strictly prohibited.
                 </p>
               </div>
             ` : ''}
@@ -185,11 +185,23 @@ export default {
       typeOptionIdea.addEventListener('click', () => {
         actions.updateTempPitch({ type: 'idea' });
       });
+      typeOptionIdea.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          actions.updateTempPitch({ type: 'idea' });
+        }
+      });
     }
 
     if (typeOptionQuestion) {
       typeOptionQuestion.addEventListener('click', () => {
         actions.updateTempPitch({ type: 'question' });
+      });
+      typeOptionQuestion.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          actions.updateTempPitch({ type: 'question' });
+        }
       });
     }
 
@@ -205,7 +217,7 @@ export default {
           const author = document.getElementById('pitch-author').value.trim() || 'Anonymous Lancs Student';
           
           if (!faculty) {
-            alert('Please select your Faculty to continue.');
+            window.showToast('Please select your Faculty to continue.', 'error');
             return;
           }
           
@@ -217,7 +229,7 @@ export default {
           const stage = document.getElementById('pitch-stage').value;
           
           if (!title || !content) {
-            alert('Please fill in both the Title and the description contents.');
+            window.showToast('Please fill in both the Title and the description contents.', 'error');
             return;
           }
           
